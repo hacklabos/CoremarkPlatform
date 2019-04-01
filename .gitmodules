@@ -1,0 +1,9 @@
+[submodule "coremark"]
+	path = coremark
+	url = https://github.com/eembc/coremark
+[submodule "STM32Cube"]
+	path = STM32Cube
+	url = https://github.com/STM32-base/STM32-base-STM32Cube
+[submodule "tivaware"]
+	path = tivaware
+	url = https://github.com/Igor-Misic/TivaWare_C_Series_Driverlib
