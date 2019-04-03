@@ -243,7 +243,7 @@ int ee_printf(const char *fmt, ...)
   sprintf(buf, fmt, args);
   va_end(args);
 
-  //while (usbd_ep_write_packet(usbd_dev, 0x82, buf, strlen(buf)) == 0);
+  HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
 
   return n;
 }
