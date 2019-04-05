@@ -18,22 +18,21 @@ Original Author: Shay Gal-on
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "coremark.h"
 #include "stm32f0xx_hal.h"
 
 static uint32_t volatile system_millis = 0;
-TIM_HandleTypeDef htim1;
 UART_HandleTypeDef huart1;
 
 int ee_printf(const char *fmt, ...);
 void SystemClock_Config(void);
-static void MX_TIM1_Init(void);
 static void MX_USART1_UART_Init(void);
 
 void Error_Handler(void);
 
-#define ITERATIONS 10
+#define ITERATIONS 100
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -82,7 +81,8 @@ static CORETIMETYPE start_time_val, stop_time_val;
 	or zeroing some system parameters - e.g. setting the cpu clocks cycles to 0.
 */
 void start_time(void) {
-	GETMYTIME(&start_time_val );
+	//GETMYTIME(&start_time_val );
+	start_time_val = HAL_GetTick();
 }
 /* Function : stop_time
 	This function will be called right after ending the timed portion of the benchmark.
@@ -91,7 +91,8 @@ void start_time(void) {
 	or other system parameters - e.g. reading the current value of cpu cycles counter.
 */
 void stop_time(void) {
-	GETMYTIME(&stop_time_val );
+	//GETMYTIME(&stop_time_val );
+	stop_time_val = HAL_GetTick();
 }
 /* Function : get_time
 	Return an abstract "ticks" number that signifies time on the system.
@@ -127,9 +128,8 @@ ee_u32 default_num_contexts=1;
 
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-	  //HAL_Init();
+	  HAL_Init();
 	  SystemClock_Config();
-	  MX_TIM1_Init();
 	  MX_USART1_UART_Init();
 
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
@@ -151,7 +151,6 @@ void portable_fini(core_portable *p)
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /**Initializes the CPU, AHB and APB busses clocks
@@ -167,45 +166,9 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-static void MX_TIM1_Init(void)
-{
-
-  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_EXTERNAL1;
-  sSlaveConfig.InputTrigger = TIM_TS_ITR0;
-  if (HAL_TIM_SlaveConfigSynchronization(&htim1, &sSlaveConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }

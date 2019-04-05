@@ -6,24 +6,6 @@ void HAL_MspInit(void)
   __HAL_RCC_PWR_CLK_ENABLE();
 }
 
-void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
-{
-  if(htim_base->Instance==TIM1)
-  {
-    __HAL_RCC_TIM1_CLK_ENABLE();
-  }
-}
-
-void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
-{
-
-  if(htim_base->Instance==TIM1)
-  {
-    __HAL_RCC_TIM1_CLK_DISABLE();
-  }
-
-}
-
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
 

@@ -7,7 +7,7 @@
 ######################################
 # target
 ######################################
-TARGET = STM32F030
+TARGET = STM32F030F4Px
 
 
 ######################################
@@ -39,8 +39,6 @@ core_portme.c \
 ../../coremark/core_matrix.c \
 ../../coremark/core_state.c \
 ../../coremark/core_util.c \
-../../STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_tim.c \
-../../STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_tim_ex.c \
 ../../STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart.c \
 ../../STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_uart_ex.c \
 ../../STM32Cube/HAL/STM32F0xx/src/stm32f0xx_hal_rcc.c \
