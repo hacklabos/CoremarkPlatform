@@ -25,7 +25,7 @@ Original Author: Shay Gal-on
 
 UART_HandleTypeDef huart1;
 
-int ee_printf(const char *fmt, ...);
+int ee_printf(char *fmt, ...);
 void SystemClock_Config(void);
 static void MX_USART1_UART_Init(void);
 
@@ -195,19 +195,55 @@ void Error_Handler(void) {
 
 }
 
-int ee_printf(const char *fmt, ...)
+int ee_printf(char *fmt, ...)
 {
+  char tmp[256];
   char buf[256];
-  va_list args;
-  int n=0;
+  int i = 0, j = 0;
+  double valueFloat = 0;
+  int valueInt = 0;
+  int valueRest = 0;
 
-  va_start(args, fmt);
-  vsprintf(buf, fmt, args);
+  char string[20];
+
+  memcpy(tmp,0u, 256);
+  va_list args, args_count;
+
+  va_start(args,fmt);
+  i = 0;
+
+  /* count number of arguments: */
+  va_copy(args_count,args);
+  va_end(args_count);
+
+  while(fmt[i] != '\n') {
+	  tmp[j] = fmt[i];
+	  if('%' == fmt[i]) {
+
+		  if('f' == fmt[i+1]) {
+			  //tmp[j+1] = 'd';
+			  valueFloat = va_arg(args_count, double);
+			  valueInt = (int)valueFloat;
+			  valueRest = (int)(((valueFloat - (double)valueInt))*100);
+			  sprintf(string, "%d.%d", valueInt, valueRest);
+			  memcpy(&tmp[j], string, strlen(string));
+			  j = j + strlen(string) - 1;
+			  i++;
+		  }
+		  else {
+			  va_arg(args_count, int);
+		  }
+	  }
+	  i++;
+	  j++;
+  }
+  tmp[j] = '\n';
+  vsprintf(buf, tmp, args);
   va_end(args);
 
   HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
 
-  return n;
+  return 0;
 }
 
 
