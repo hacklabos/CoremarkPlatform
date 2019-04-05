@@ -23,7 +23,6 @@ Original Author: Shay Gal-on
 #include "coremark.h"
 #include "stm32f0xx_hal.h"
 
-static uint32_t volatile system_millis = 0;
 UART_HandleTypeDef huart1;
 
 int ee_printf(const char *fmt, ...);
@@ -203,7 +202,7 @@ int ee_printf(const char *fmt, ...)
   int n=0;
 
   va_start(args, fmt);
-  sprintf(buf, fmt, args);
+  vsprintf(buf, fmt, args);
   va_end(args);
 
   HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
