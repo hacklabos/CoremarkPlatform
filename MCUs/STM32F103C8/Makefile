@@ -107,6 +107,7 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+-I./ \
 -IInc \
 -I../../STM32Cube/HAL/STM32F1xx/inc \
 -I../../STM32Cube/HAL/STM32F1xx/inc/Legacy \
