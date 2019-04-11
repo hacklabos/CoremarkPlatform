@@ -111,7 +111,7 @@ static void BoardInit(void)
     //
     // Configure the UART for 115,200, 8-N-1 operation.
     //
-    UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200,
+    UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 9600,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
 
@@ -211,9 +211,10 @@ void portable_fini(core_portable *p)
 	p->portable_id=0;
 }
 
+uint8_t buf[256];
+
 int ee_printf(const char *fmt, ...)
 {
-  uint8_t buf[256];
   va_list args;
   int n=0;
 
