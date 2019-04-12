@@ -111,7 +111,9 @@ static void BoardInit(void)
     //
     // Configure the UART for 115,200, 8-N-1 operation.
     //
-    UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 9600,
+    //uint32_t sysClock = SysCtlClockGet(); //There is known bug in SysCtlClockGet. Return 66.66 MHz if -mfloat-abi=hard is used instead 80MHz
+    uint32_t sysClock = 80000000;
+    UARTConfigSetExpClk(UART0_BASE, sysClock, 9600,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                              UART_CONFIG_PAR_NONE));
 

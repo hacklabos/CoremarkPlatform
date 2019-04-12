@@ -61,13 +61,13 @@ BIN = $(CP) -O binary -S
 # CFLAGS
 #######################################
 # cpu
-CPU = -mcpu=cortex-m4
+CPU = -mcpu=cortex-m4 -march=armv7e-m
 
 # fpu
 # NONE for Cortex-M0/M0+/M3
 
 # float-abi
-FLOAT-ABI = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+FLOAT-ABI = -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 
 # mcu
@@ -76,7 +76,7 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 # C defines
 C_DEFS =  \
 -DPART_TM4C123GH6PM \
--DITERATIONS=1000 \
+-DITERATIONS=2000 \
 -DFLAGS_STR="\"Unknown\""
 
 # C includes
@@ -106,7 +106,7 @@ LDSCRIPT = tm4c123gh6pm.lds
 # libraries
 LIBDIR = -L../../tivaware/driverlib/gcc
 LIBS = -ldriver -lc -lm -lnosys
-LDFLAGS = $(MCU) -specs=nosys.specs -u _printf_float -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS = $(MCU) -u _printf_float -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
