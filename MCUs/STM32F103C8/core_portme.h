@@ -72,11 +72,11 @@ typedef clock_t CORE_TICKS;
  #ifdef __GNUC__
  #define COMPILER_VERSION "GCC"__VERSION__
  #else
- #define COMPILER_VERSION "Please put compiler version here (e.g. gcc 4.1)"
+ #define COMPILER_VERSION "arm-none-eabi-gcc 6.3.1"
  #endif
 #endif
 #ifndef COMPILER_FLAGS 
- #define COMPILER_FLAGS FLAGS_STR /* "Please put compiler flags here (e.g. -o3)" */
+ #define COMPILER_FLAGS FLAGS_STR /* "-Og" */
 #endif
 #ifndef MEM_LOCATION 
  #define MEM_LOCATION "STACK"
@@ -184,7 +184,7 @@ typedef struct CORE_PORTABLE_S {
 /* target specific init/fini */
 void portable_init(core_portable *p, int *argc, char *argv[]);
 void portable_fini(core_portable *p);
-
+int ee_printf(const char *fmt, ...);
 #if !defined(PROFILE_RUN) && !defined(PERFORMANCE_RUN) && !defined(VALIDATION_RUN)
 #if (TOTAL_DATA_SIZE==1200)
 #define PROFILE_RUN 1

@@ -13,7 +13,7 @@
 ######################################
 # target
 ######################################
-TARGET = port_bluepill
+TARGET = stm32f103c8
 
 
 ######################################
@@ -108,7 +108,6 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -I./ \
--IInc \
 -I../../STM32Cube/HAL/STM32F1xx/inc \
 -I../../STM32Cube/HAL/STM32F1xx/inc/Legacy \
 -I../../STM32Cube/CMSIS/STM32F1xx/inc \
