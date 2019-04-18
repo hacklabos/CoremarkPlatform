@@ -1,4 +1,4 @@
-This is an educational purpose project where you can learn how to port your Coremark to your microcontroller. 
+This is an educational purpose project where you can learn how to port Coremark to your microcontroller. 
 The idea behind this project is to have a large number of ported microcontrollers which will help a new user to learn how to port their own microcontroller.
 
 In this project you will learn:
