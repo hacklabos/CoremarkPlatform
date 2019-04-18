@@ -10,10 +10,7 @@ In this project you will learn:</br>
 #### Currently ported MCUs
 
 
-| ST MCUs          | Board             | Score  |
-| ---------------- |:-----------------:| ------:|
-| STM32F030F4Px    | Mini System Board | 8.87   |
-
-| TI MCUs          | Board             | Score  |
-| ---------------- |:-----------------:| ------:|
-| TM4C123GH6PM     | TM4C123GXL        | 102.01 |
+| MCUs          | Board                | Freuency  | Score  |
+| ---------------- |:-----------------:| ---------:| ------:|
+| STM32F030F4Px    | Mini System Board | 48 MHz   | 8.87    |
+| TM4C123GH6PM     | TM4C123GXL        | 80 MHz   | 102.01  |
