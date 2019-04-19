@@ -12,5 +12,5 @@ In this project you will learn:</br>
 
 | MCUs          | Board                | Freuency  | Score  |
 | ---------------- |:-----------------:| ---------:| ------:|
-| STM32F030F4Px    | Mini System Board | 48 MHz   | 8.87    |
+| STM32F030F4Px    | Mini System Board | 48 MHz   | 36.10   |
 | TM4C123GH6PM     | TM4C123GXL        | 80 MHz   | 102.01  |
