@@ -23,11 +23,11 @@ Original Author: Shay Gal-on
 #include "coremark.h"
 #include "stm32l4xx_hal.h"
 
-UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart2;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART1_UART_Init(void);
+static void MX_USART2_UART_Init(void);
 void Error_Handler(void);
 
 #if VALIDATION_RUN
@@ -166,26 +166,45 @@ void SystemClock_Config(void)
 }
 
 
-static void MX_USART1_UART_Init(void)
+static void MX_USART2_UART_Init(void)
 {
-    huart1.Instance = USART1;
-    huart1.Init.BaudRate = 9600;
-    huart1.Init.WordLength = UART_WORDLENGTH_8B;
-    huart1.Init.StopBits = UART_STOPBITS_1;
-    huart1.Init.Parity = UART_PARITY_NONE;
-    huart1.Init.Mode = UART_MODE_TX;
-    huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-    if (HAL_UART_Init(&huart1) != HAL_OK)
-    {
-        Error_Handler();
-    }
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
 }
 
 static void MX_GPIO_Init(void)
 {
-    __HAL_RCC_GPIOH_CLK_ENABLE();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
 }
 
 
@@ -194,7 +213,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     HAL_Init();
     SystemClock_Config();
     MX_GPIO_Init();
-    MX_USART1_UART_Init();
+    MX_USART2_UART_Init();
 
     if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
             ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");
@@ -226,7 +245,7 @@ int ee_printf(char *fmt, ...)
     vsprintf(buf, fmt, args);
     va_end(args);
 
-    HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
+    HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), 0xFFFF);
 
     return n;
 }
