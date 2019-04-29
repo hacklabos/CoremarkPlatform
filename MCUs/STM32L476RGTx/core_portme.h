@@ -57,8 +57,6 @@ Original Author: Shay Gal-on
 #define HAS_PRINTF 0
 #endif
 
-#define FLAGS_STR "Unknown"
-
 /* Configuration : CORE_TICKS
 	Define type of return from the timing functions.
  */

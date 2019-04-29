@@ -57,8 +57,6 @@ Original Author: Shay Gal-on
 #define HAS_PRINTF 0
 #endif
 
-#define FLAGS_STR "Unknown"
-
 /* Configuration : CORE_TICKS
 	Define type of return from the timing functions.
  */
@@ -72,7 +70,7 @@ typedef clock_t CORE_TICKS;
  #ifdef __GNUC__
  #define COMPILER_VERSION "GCC"__VERSION__
  #else
- #define COMPILER_VERSION "Please put compiler version here (e.g. gcc 4.1)"
+ #define COMPILER_VERSION "arm-none-eabi-gcc 5.4.1"
  #endif
 #endif
 #ifndef COMPILER_FLAGS 
@@ -184,7 +182,6 @@ typedef struct CORE_PORTABLE_S {
 /* target specific init/fini */
 void portable_init(core_portable *p, int *argc, char *argv[]);
 void portable_fini(core_portable *p);
-int ee_printf(char *fmt, ...);
 
 #if !defined(PROFILE_RUN) && !defined(PERFORMANCE_RUN) && !defined(VALIDATION_RUN)
 #if (TOTAL_DATA_SIZE==1200)
@@ -195,5 +192,7 @@ int ee_printf(char *fmt, ...);
 #define VALIDATION_RUN 1
 #endif
 #endif
+
+int ee_printf(const char *fmt, ...);
 
 #endif /* CORE_PORTME_H */

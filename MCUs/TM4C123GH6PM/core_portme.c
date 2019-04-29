@@ -17,20 +17,27 @@ Original Author: Shay Gal-on
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include "coremark.h"
+
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdarg.h>
 #include <string.h>
 
-#include "coremark.h"
-#include "stm32f0xx_hal.h"
+#include <inc/hw_ints.h>
+#include <inc/hw_memmap.h>
+#include <inc/hw_types.h>
+#include <inc/hw_gpio.h>
 
-UART_HandleTypeDef huart1;
+#include <driverlib/gpio.h>
+#include <driverlib/pin_map.h>
+#include <driverlib/sysctl.h>
+#include <driverlib/uart.h>
+#include <driverlib/interrupt.h>
+#include <driverlib/systick.h>
 
-void SystemClock_Config(void);
-static void MX_USART1_UART_Init(void);
-
-void Error_Handler(void);
-
-#define ITERATIONS 1000
+static uint32_t volatile s_millisec = 0;
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -51,7 +58,7 @@ void Error_Handler(void);
 	volatile ee_s32 seed5_volatile=0;
 /* Porting : Timing functions
 	How to capture time and convert to seconds must be ported to whatever is supported by the platform.
-	e.g. Read value from on board RTC, read value from cpu clock cycles performance counter etc.
+	e.g. Read value from on board RTC, read value from cpu clock cycles performance counter etc. 
 	Sample implementation for standard time.h and windows.h definitions included.
 */
 /* Define : TIMER_RES_DIVIDER
@@ -61,8 +68,8 @@ void Error_Handler(void);
 	If there are issues with the return value overflowing, increase this value.
 	*/
 #define NSECS_PER_SEC CLOCKS_PER_SEC
-#define CORETIMETYPE clock_t
-#define GETMYTIME(_t) (*_t=system_millis)
+#define CORETIMETYPE clock_t 
+#define GETMYTIME(_t) (*_t=s_millisec)
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
 #define SAMPLE_TIME_IMPLEMENTATION 1
@@ -72,25 +79,88 @@ void Error_Handler(void);
 /** Define Host specific (POSIX), or target specific global time variables. */
 static CORETIMETYPE start_time_val, stop_time_val;
 
+void UARTSend(uint8_t *pui8Buffer)
+{
+    uint32_t i;
+    uint32_t lenght = strlen((char*)pui8Buffer);
+    pui8Buffer[lenght] = '\n';
+
+    for(i = 0; i < lenght; i++)
+    {
+        bool success = false;
+        while(!success) {
+            success = UARTCharPutNonBlocking(UART0_BASE, pui8Buffer[i]);
+        }
+    }
+}
+
+
+static void BoardInit(void)
+{
+    // 80 MHz
+    SysCtlClockSet(SYSCTL_SYSDIV_2_5|SYSCTL_USE_PLL|SYSCTL_OSC_MAIN|SYSCTL_XTAL_16MHZ);
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    GPIOPinConfigure(GPIO_PA0_U0RX);
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+
+    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    //
+    // Configure the UART for 115,200, 8-N-1 operation.
+    //
+    //uint32_t sysClock = SysCtlClockGet(); //There is known bug in SysCtlClockGet. Return 66.66 MHz if -mfloat-abi=hard is used instead 80MHz
+    uint32_t sysClock = 80000000;
+    UARTConfigSetExpClk(UART0_BASE, sysClock, 9600,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                             UART_CONFIG_PAR_NONE));
+
+    //
+    // Enable the UART interrupt.
+    //
+    IntEnable(INT_UART0);
+    UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+
+    //
+    // Prompt for text to be entered.
+    //
+}
+
+/** This is the interrupt handler for the SysTick */
+
+void SycTickCallback()
+{
+    s_millisec++;
+}
+/** This configures the Systick to interrupt every millisecond */
+
+void SysTickInit()
+{
+    SysTickPeriodSet(80000);
+    SysTickIntRegister(SycTickCallback);
+    SysTickIntEnable();
+    SysTickEnable();
+}
+
 /* Function : start_time
 	This function will be called right before starting the timed portion of the benchmark.
 
-	Implementation may be capturing a system timer (as implemented in the example code)
+	Implementation may be capturing a system timer (as implemented in the example code) 
 	or zeroing some system parameters - e.g. setting the cpu clocks cycles to 0.
 */
 void start_time(void) {
-	//GETMYTIME(&start_time_val );
-	start_time_val = HAL_GetTick();
+	GETMYTIME(&start_time_val );      
 }
 /* Function : stop_time
 	This function will be called right after ending the timed portion of the benchmark.
 
-	Implementation may be capturing a system timer (as implemented in the example code)
+	Implementation may be capturing a system timer (as implemented in the example code) 
 	or other system parameters - e.g. reading the current value of cpu cycles counter.
 */
 void stop_time(void) {
-	//GETMYTIME(&stop_time_val );
-	stop_time_val = HAL_GetTick();
+	GETMYTIME(&stop_time_val );      
 }
 /* Function : get_time
 	Return an abstract "ticks" number that signifies time on the system.
@@ -98,7 +168,7 @@ void stop_time(void) {
 	Actual value returned may be cpu cycles, milliseconds or any other value,
 	as long as it can be converted to seconds by <time_in_secs>.
 	This methodology is taken to accomodate any hardware or simulated platform.
-	The sample implementation returns millisecs by default,
+	The sample implementation returns millisecs by default, 
 	and the resolution is controlled by <TIMER_RES_DIVIDER>
 */
 CORE_TICKS get_time(void) {
@@ -119,16 +189,13 @@ secs_ret time_in_secs(CORE_TICKS ticks) {
 ee_u32 default_num_contexts=1;
 
 /* Function : portable_init
-	Target specific initialization code
+	Target specific initialization code 
 	Test for some common mistakes.
 */
-
-
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-	  HAL_Init();
-	  SystemClock_Config();
-	  MX_USART1_UART_Init();
+    BoardInit();
+    SysTickInit();
 
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
 		ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");
@@ -139,124 +206,24 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 	p->portable_id=1;
 }
 /* Function : portable_fini
-	Target specific final code
+	Target specific final code 
 */
 void portable_fini(core_portable *p)
 {
 	p->portable_id=0;
 }
 
-void SystemClock_Config(void)
+uint8_t buf[256];
+
+int ee_printf(const char *fmt, ...)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  va_list args;
+  int n=0;
 
-  /**Initializes the CPU, AHB and APB busses clocks
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
-  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /**Initializes the CPU, AHB and APB busses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1;
-  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-static void MX_USART1_UART_Init(void)
-{
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 9600;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-void Error_Handler(void) {
-
-}
-
-int ee_printf(char *fmt, ...)
-{
-  char tmp[256];
-  char buf[256];
-  int i = 0, j = 0;
-  double valueFloat = 0;
-  int valueInt = 0;
-  int valueRest = 0;
-
-  char string[20];
-
-  memcpy(tmp,0u, 256);
-  va_list args, args_count;
-
-  va_start(args,fmt);
-  i = 0;
-
-  /* count number of arguments: */
-  va_copy(args_count,args);
-  va_end(args_count);
-
-  while(fmt[i] != '\n') {
-	  tmp[j] = fmt[i];
-	  if('%' == fmt[i]) {
-
-		  if('f' == fmt[i+1]) {
-			  //tmp[j+1] = 'd';
-			  valueFloat = va_arg(args_count, double);
-			  valueInt = (int)valueFloat;
-			  valueRest = (int)(((valueFloat - (double)valueInt))*100);
-			  sprintf(string, "%d.%d", valueInt, valueRest);
-			  memcpy(&tmp[j], string, strlen(string));
-			  j = j + strlen(string) - 1;
-			  i++;
-		  }
-		  else {
-			  va_arg(args_count, int);
-		  }
-	  }
-	  i++;
-	  j++;
-  }
-  tmp[j] = '\n';
-  vsprintf(buf, tmp, args);
+  va_start(args, fmt);
+  vsprintf((char*)buf, fmt, args);
   va_end(args);
+  UARTSend(buf);
 
-  HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
-
-  return 0;
+  return n;
 }
-
-
