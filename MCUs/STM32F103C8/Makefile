@@ -51,6 +51,7 @@ core_portme.c \
 ../../STM32Cube/HAL/STM32F1xx/src/stm32f1xx_hal_rcc_ex.c \
 ../../STM32Cube/HAL/STM32F1xx/src/stm32f1xx_hal_gpio.c \
 ../../STM32Cube/HAL/STM32F1xx/src/stm32f1xx_hal_cortex.c \
+../../STM32Cube/HAL/STM32F1xx/src/stm32f1xx_hal_rtc.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -99,7 +100,7 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
--DSTM32F103xB
+-DSTM32F103xB \
 
 
 # AS includes
@@ -137,7 +138,7 @@ LDSCRIPT = STM32F103C8Tx_FLASH.ld
 # libraries
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
-LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS = $(MCU) -u _printf_float -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin

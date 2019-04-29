@@ -27,6 +27,9 @@ Original Author: Shay Gal-on
 /* Configuration : HAS_FLOAT 
 	Define to 1 if the platform supports floating point.
 */
+#define HAS_FLOAT 1
+
+
 #ifndef HAS_FLOAT 
 #define HAS_FLOAT 1
 #endif
