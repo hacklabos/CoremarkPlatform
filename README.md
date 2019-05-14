@@ -18,7 +18,7 @@ In this project you will learn:</br>
 | TM4C123GH6PM     | TM4C123GXL        | ARM Cortex-M4 | 80 MHz    | 102.01 |
 | STM32F427VIx     | Pixracer          | ARM Cortex-M4 | 180 MHz   | 258.33 |
 | STM32L476RGTx    | Nucleo64          | ARM Cortex-M4 | 80 MHz    | 127.87 |
-| STM32F103C8      | Blue Pill         | ARM Cortex-M3 | 72 MHz    | 75.09  |
+| STM32F103C8      | Blue Pill         | ARM Cortex-M3 | 72 MHz    | 95.93  |
 
 <br><br>
 #### Repository structure
