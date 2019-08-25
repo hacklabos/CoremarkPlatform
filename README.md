@@ -23,4 +23,4 @@ In this project you will learn:</br>
 <br><br>
 #### Repository structure
 
-![](https://github.com/hacklabos/CoremarkPlatform/tree/master/Documentation/Diagrams/coremark_platforms_submodules_diagram.png)
+![](https://github.com/hacklabos/CoremarkPlatform/blob/master/Documentation/Diagrams/coremark_platforms_submodules_diagram.png?raw=true)
