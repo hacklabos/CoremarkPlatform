@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Coremark_STM32F427VI</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>coremark</name>
+			<type>2</type>
+			<location>/media/branimir/5bef6032-0370-4f59-935d-82210e02d20c/justLinuxthings/gitLocRepos/CoremarkPlatform/coremark</location>
+		</link>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<location>/media/branimir/5bef6032-0370-4f59-935d-82210e02d20c/justLinuxthings/gitLocRepos/CoremarkPlatform/STM32Cube/HAL/STM32F4xx/src</location>
+		</link>
+	</linkedResources>
+</projectDescription>
