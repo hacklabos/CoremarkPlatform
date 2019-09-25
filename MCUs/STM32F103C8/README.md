@@ -1,5 +1,5 @@
-Initialization complete
-System clock=128000000 Hz
+Initialization complete</br>
+System clock=128000000 Hz</br>
 2K performance run parameters for coremark.</br>
 CoreMark Size    : 666</br>
 Total ticks      : 13623</br>
